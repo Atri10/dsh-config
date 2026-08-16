@@ -1,0 +1,11 @@
+# Runtime data — contains credentials, sessions, and storage. Lives on the
+# host bind mount; NEVER commit (the API key lives in .credentials.yaml).
+dsh-home/
+
+# Secrets
+.env
+*.pem
+*.key
+
+# macOS
+.DS_Store

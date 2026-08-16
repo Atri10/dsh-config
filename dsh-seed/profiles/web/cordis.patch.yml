@@ -1,0 +1,25 @@
+# User patch layer for the `web` profile — applied after the dsh-base and
+# dsh-web-app bundle layers. A patch replaces the targeted row's whole
+# `config`, so each row below restates every key it owns.
+#
+# Tuning goals: (1) make the custom `power` preset the default for new
+# sessions, (2) raise agent-loop parallelism so independent tool calls run
+# concurrently, (3) lengthen the bash sandbox timeout so big installs/builds
+# do not get killed mid-run. Values are env-overridable
+# (DSH_MAX_PARALLEL_TOOL_CALLS, DSH_BASH_TIMEOUT_MS) so tuning does not
+# require editing this file.
+#
+# web_fetch: disabled in the power preset (no HTTP fetch provider ships in
+# the npm dist); web_search works via the DeepSeek provider.
+- id: agent-presets
+  config:
+    default: power
+
+- id: agent-loop
+  config:
+    agents: []
+    maxParallelToolCalls: !!js Number(process.env.DSH_MAX_PARALLEL_TOOL_CALLS ?? 16)
+
+- id: bash-sandbox
+  config:
+    timeoutMs: !!js Number(process.env.DSH_BASH_TIMEOUT_MS ?? 600000)

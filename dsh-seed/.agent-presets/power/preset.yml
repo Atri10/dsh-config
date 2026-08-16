@@ -1,0 +1,3 @@
+name: Power Mode
+description: Standard-mode full toolset (bash, fs+search, skills, plan, goals, subagents, workflow, web) with a persistent shell (cwd/env survive across calls) and a Docker-sandbox-aware persona tuned for speed.
+order: 0

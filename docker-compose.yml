@@ -1,0 +1,58 @@
+services:
+  deepseek-harness:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local/deepseek-harness:latest
+    container_name: deepseek-harness
+    hostname: deepseek-harness
+
+    ports:
+      # Host 3080 is what you open in the browser — access it via
+      # http://localhost:3080, not the bare IP (dshdocs recommends the
+      # hostname form). This maps to the container's internal bridge
+      # port (3081), NOT to dsh's own port — see start.sh for why.
+      # Loopback-only: not reachable from LAN or anywhere but this Mac.
+      - "127.0.0.1:3080:3081"
+
+    environment:
+      TZ: Asia/Kolkata
+      NODE_ENV: production
+      # Provider keys — env is the config-driven path; the credentials store
+      # (~/.dsh/.credentials.yaml) takes precedence when both are set.
+      COMMAND_CODE_API_KEY: ${COMMAND_CODE_API_KEY}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      DSH_HOME: /root/.dsh
+      DSH_PORT: "3080"
+      PROXY_PORT: "3081"
+      # Bash sandbox cap for one model bash call (ms) — long installs/builds
+      # survive without the shell being killed mid-run.
+      DSH_BASH_TIMEOUT_MS: ${DSH_BASH_TIMEOUT_MS:-600000}
+      # Agent-loop parallel tool-call cap per agent step (1 = serial).
+      DSH_MAX_PARALLEL_TOOL_CALLS: ${DSH_MAX_PARALLEL_TOOL_CALLS:-16}
+
+    volumes:
+      # Runtime data (credentials, sessions, storages, user presets) — lives
+      # on the host so deleting the container keeps everything. The image
+      # seeds a fresh home from /opt/dsh-seed only when this dir is empty.
+      - ./dsh-home:/root/.dsh
+      # Seed source baked into the image (read-only here, overridden by the
+      # start.sh first-boot copy into the bind mount above).
+      - ./dsh-seed:/opt/dsh-seed:ro
+      # The user's workspace, mounted as the default working directory.
+      - "${WORKSPACE_DIR:-./workspace}:/workspace"
+
+    working_dir: /workspace
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3081 >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
