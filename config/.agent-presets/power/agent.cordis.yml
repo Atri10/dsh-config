@@ -282,14 +282,12 @@
     allowParallelInProgress: true
 
 # The `web` service and its search provider stay in the host composition; only
-# the model-facing tool is per-session.
-# NOTE: the npm dist ships no HTTP fetch provider (only the DeepSeek
-# web-search provider), so `fetch: false` keeps web_fetch out of the model's
-# catalog instead of registering a tool that would fail with
-# WEB_PROVIDER_UNAVAILABLE at call time. Re-enable (fetch: true) once a fetch
-# provider is mounted (e.g. building from source).
+# the model-facing tool is per-session. `fetch: true` — the vendored
+# dsh-web-fetch-http-local plugin (see profiles/web/cordis.patch.yml) registers
+# the `http` fetch provider, selected as the web row's fetchProvider, so
+# web_fetch resolves a usable provider at call time.
 - id: tool-web
   name: '@deepseek-ai/dsh-tool-web'
   config:
-    fetch: false
+    fetch: true
     searchTimeoutMs: 60000

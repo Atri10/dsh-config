@@ -5,12 +5,15 @@
 # Tuning goals: (1) make the custom `power` preset the default for new
 # sessions, (2) raise agent-loop parallelism so independent tool calls run
 # concurrently, (3) lengthen the bash sandbox timeout so big installs/builds
-# do not get killed mid-run. Values are env-overridable
-# (DSH_MAX_PARALLEL_TOOL_CALLS, DSH_BASH_TIMEOUT_MS) so tuning does not
-# require editing this file.
+# do not get killed mid-run, (4) mount a web_fetch provider so the model can
+# fetch docs. Values are env-overridable (DSH_MAX_PARALLEL_TOOL_CALLS,
+# DSH_BASH_TIMEOUT_MS) so tuning does not require editing this file.
 #
-# web_fetch: disabled in the power preset (no HTTP fetch provider ships in
-# the npm dist); web_search works via the DeepSeek provider.
+# web_fetch: the npm dist ships no HTTP fetch provider, so a vendored local
+# plugin (plugins/dsh-web-fetch-http) registers one into the web seam; the
+# `web` row below selects it as the configured fetch provider. The loader
+# resolves relative `name`s against the profile directory, which is why the
+# plugin path starts with `./plugins/`.
 - id: agent-presets
   config:
     default: power
@@ -23,3 +26,19 @@
 - id: bash-sandbox
   config:
     timeoutMs: !!js Number(process.env.DSH_BASH_TIMEOUT_MS ?? 600000)
+
+# The vendored web_fetch provider (registered by plugin id `web-fetch-http-local`
+# under provider id `http`).
+- insert:
+    - id: web-fetch-http-local
+      name: './plugins/dsh-web-fetch-http/index.js'
+      config:
+        timeoutMs: 30000
+        maxBodyChars: 100000
+
+# Select the vendored provider for web_fetch (restates every key the web row
+# owns; `searchProvider` stays the DeepSeek search provider).
+- id: web
+  config:
+    searchProvider: deepseek-official
+    fetchProvider: http

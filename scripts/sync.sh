@@ -25,11 +25,11 @@ if [ ! -d "$SEED_DIR" ] || [ ! -d "$HOME_DIR" ]; then
   exit 1
 fi
 
-# Config-only copy: the web profile patch + user agent presets.
+# Config-only copy: the web profile patch + user agent presets + local plugins.
 # Explicitly NOT: sessions/, storages/, .credentials.yaml, .anonymous-user-id,
 # settings.yaml, profiles/node_modules (symlink farm into the image).
 # Remove-then-copy so a deleted source file does not linger in the target.
-for rel in profiles/web/cordis.patch.yml .agent-presets; do
+for rel in profiles/web/cordis.patch.yml profiles/web/plugins .agent-presets; do
   src="$SEED_DIR/$rel"
   dst="$HOME_DIR/$rel"
   if [ -e "$src" ]; then

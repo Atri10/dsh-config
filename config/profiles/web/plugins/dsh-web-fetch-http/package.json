@@ -1,0 +1,9 @@
+{
+  "name": "dsh-web-fetch-http-local",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "description": "Vendored anonymous HTTP(S) WebFetchProvider for the dsh web seam (adapted from @deepseek-ai/dsh-web-fetch-http).",
+  "dependencies": {}
+}

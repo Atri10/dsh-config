@@ -84,8 +84,14 @@ workspace/            # bind-mounted default working directory
 data/                 # (reserved)
 ```
 
-## Known limitation
+## Web access
 
-`web_fetch` is disabled in the power preset because the npm dist ships no HTTP
-fetch provider (only the DeepSeek web-search provider). `web_search` works.
-Re-enable `fetch: true` after mounting a fetch provider (build from source).
+- **`web_search`** — DeepSeek search provider (works out of the box).
+- **`web_fetch`** — enabled. The npm dist ships no HTTP fetch provider, so a
+  vendored local plugin (`config/profiles/web/plugins/dsh-web-fetch-http/`,
+  adapted from the official `@deepseek-ai/dsh-web-fetch-http`) registers one
+  into the web seam; the profile patch selects it as `fetchProvider`. The
+  loader imports it by relative path, so it survives rebuilds via the image
+  seed. Same-origin redirects only; http(s) only; 5 MB / 100k-char caps.
+  SSRF caveat: do not expose this stack where the agent could reach sensitive
+  internal targets.
