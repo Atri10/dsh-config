@@ -38,7 +38,7 @@ services:
       - ./dsh-home:/root/.dsh
       # Seed source baked into the image (read-only here, overridden by the
       # start.sh first-boot copy into the bind mount above).
-      - ./dsh-seed:/opt/dsh-seed:ro
+      - ./config:/opt/dsh-seed:ro
       # The user's workspace, mounted as the default working directory.
       - "${WORKSPACE_DIR:-./workspace}:/workspace"
 

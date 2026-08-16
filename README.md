@@ -26,8 +26,8 @@ toolset). Pick a different preset per session in the UI.
   skills, plan, goals, subagents, workflow, web, jobs) + **persistent bash**
   (cwd/env survive across tool calls) + Docker-sandbox-aware persona that
   steers the model toward `rg`/`jq`/`nohup` patterns.
-- **Image-level seed** (`dsh-seed/` → `/opt/dsh-seed`): the preset + profile
-  patch are baked in; `start.sh` copies them into `$DSH_HOME` on first boot
+- **Image-level seed** (`config/` → `/opt/dsh-seed`): the preset + profile
+  patch are baked in; `scripts/start.sh` copies them into `$DSH_HOME` on first boot
   only. Delete the container and `docker compose up --build` reproduces the
   setup.
 - **Runtime data on a host bind mount** (`dsh-home/` → `/root/.dsh`):
@@ -48,9 +48,9 @@ Apply with `docker compose up -d` (recreates the container).
 
 ## Editing the preset / profile
 
-1. Edit `dsh-seed/.agent-presets/power/agent.cordis.yml` (persona, tools) or
-   `dsh-seed/profiles/web/cordis.patch.yml` (parallelism, default preset).
-2. `./sync.sh` — pushes config into the live home (`dsh-home/`).
+1. Edit `config/.agent-presets/power/agent.cordis.yml` (persona, tools) or
+   `config/profiles/web/cordis.patch.yml` (parallelism, default preset).
+2. `scripts/sync.sh` — pushes config into the live home (`dsh-home/`).
 3. `docker compose restart` — takes effect for new sessions.
 
 Reseed from scratch (loses credentials + sessions):
@@ -73,9 +73,12 @@ re-run after a full reseed.
 ```
 Dockerfile            # node 24 + dsh + node-pty + rg/jq/pnpm + seed copy
 docker-compose.yml    # loopback-only web, bind mounts, healthcheck
-start.sh              # seed-on-first-boot + launch + socat bridge
-sync.sh               # push dsh-seed config -> dsh-home (config only)
-dsh-seed/             # image-level config source of truth (see its README)
+scripts/
+  start.sh            # seed-on-first-boot + launch + socat bridge
+  sync.sh             # push config/ -> dsh-home (config only)
+config/               # image-level config source of truth (see its README)
+  .agent-presets/     #   custom agent presets (power = default)
+  profiles/web/       #   web profile patch layer
 dsh-home/             # runtime home: credentials/sessions/storages (gitignored)
 workspace/            # bind-mounted default working directory
 data/                 # (reserved)

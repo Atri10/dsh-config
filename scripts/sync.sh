@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Sync seed config into the live $DSH_HOME bind mount.
 #
-# dsh-seed/ is the image-level source of truth (baked at build via
-# `COPY dsh-seed/ /opt/dsh-seed/`, copied into $DSH_HOME on FIRST boot only by
+# config/ is the image-level source of truth (baked at build via
+# `COPY config/ /opt/dsh-seed/`, copied into $DSH_HOME on FIRST boot only by
 # start.sh). Once a home is seeded, dsh reads $DSH_HOME directly, so edits to
-# dsh-seed/ do NOT reach the running instance. Run this after changing seed
+# config/ do NOT reach the running instance. Run this after changing seed
 # files to push them into the live home — without touching runtime data
 # (credentials, sessions, storages).
 #
@@ -15,9 +15,9 @@
 #   docker compose down && rm -rf dsh-home && docker compose up -d --build
 
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."   # repo root (script lives in scripts/)
 
-SEED_DIR="dsh-seed"
+SEED_DIR="config"
 HOME_DIR="${DSH_HOME_DIR:-dsh-home}"
 
 if [ ! -d "$SEED_DIR" ] || [ ! -d "$HOME_DIR" ]; then

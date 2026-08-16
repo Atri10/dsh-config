@@ -55,13 +55,13 @@ RUN set -eux; \
 
 # Seed the harness home: the custom `power` agent preset (persistent bash +
 # Docker-aware persona) and the web profile's patch layer (parallelism,
-# default preset, web fetch provider). start.sh copies these into $DSH_HOME
+# default preset). scripts/start.sh copies these into $DSH_HOME
 # on first boot only, so a deleted container + `docker compose up --build`
 # reproduces the full setup — while runtime data (credentials, sessions)
 # stays in the bind-mounted $DSH_HOME and is never clobbered.
-COPY dsh-seed/ /opt/dsh-seed/
+COPY config/ /opt/dsh-seed/
 
-COPY start.sh /usr/local/bin/start.sh
+COPY scripts/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
 RUN mkdir -p /workspace /data
